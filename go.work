@@ -1,0 +1,10 @@
+go 1.22.1
+
+use (
+	./cart
+	./common
+	./gateway
+	./payment
+	./products
+	./users
+)

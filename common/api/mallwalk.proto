@@ -1,0 +1,145 @@
+syntax = "proto3";
+
+option go_package = "github.com/vaidik-bajpai/mallwalk/common/api";
+
+package api;
+
+import "google/protobuf/timestamp.proto";
+
+service UserService {
+    rpc CreateUser(CreateUserRequest) returns (User);
+    rpc UserLogin(UserLoginRequest) returns (UserLoginResponse);
+}
+
+message CreateUserRequest {
+    string Username = 1;
+    string Email = 2;
+    string Password = 3;
+}
+
+message User {
+    string Username = 1;
+    string Email = 2;
+}
+
+message UserLoginRequest {
+    string Email = 1;
+    string Password = 2;
+}
+
+message UserLoginResponse {
+    string Token = 1;
+}
+
+service ProductService {
+    rpc CreateProduct(CreateProductRequest) returns(Product);
+    rpc GetProduct (GetProductRequest) returns(Product);
+    rpc ListProduct (ListProductsRequest) returns(ListProductsResponse);
+    rpc UpdateProduct (UpdateProductRequest) returns(Product);
+    rpc DeleteProduct (DeleteProductRequest) returns(DeleteProductResponse);
+}
+
+message CreateProductRequest {
+    string Name = 1;
+    uint32 Price = 2;
+    uint32 Stock = 3;
+    string Description = 4;
+    string Category = 5;
+    float Rating = 6;
+    string Image = 7;
+}
+
+message Product{
+    string ID = 1;
+    string Name = 2;
+    uint32 Price = 3;
+    uint32 Stock = 4;
+    string Description = 5;
+    string Category = 6;
+    float Rating = 7;
+    string Image = 8;
+    google.protobuf.Timestamp CreatedAt = 9;
+    google.protobuf.Timestamp UpdatedAt = 10;
+}
+
+message ProductSummary {
+    string ID = 1;
+    string Name = 2;
+    uint32 Price = 3;
+    uint32 Stock = 4;
+    float Rating = 5;
+    string Image = 6;
+}
+
+message GetProductRequest{
+    string ProductID = 1;
+}
+
+message ListProductsRequest{
+    uint32 PageNumber = 1;
+    uint32 PageSize = 2;
+    string Category = 3;
+    float MinRating = 4;
+}
+
+message ListProductsResponse {
+    repeated ProductSummary Products = 1;
+    uint32 TotalProducts = 2;
+}
+
+message UpdateProductRequest{
+    string ID = 1;
+    string Name = 2;
+    uint32 Price = 3;
+    uint32 Stock = 4;
+    string Description = 5;
+    string Category = 6;
+    float Rating = 7;
+    string Image = 8;
+}
+
+message DeleteProductRequest{
+    string ProductID = 1;
+}
+
+message DeleteProductResponse{
+    bool Success = 1;
+}
+
+service CartService {
+    rpc AddToCart(AddToCartRequest) returns (CartResponse);
+    rpc RemoveFromCart(RemoveItemRequest) returns (CartResponse);
+    rpc ViewCart(ViewCartRequest) returns (Cart);
+}
+message AddToCartRequest {
+    string CartID = 1;
+    Item Item = 2;
+}
+
+message Item {
+    string ProductID = 1;    
+    string Name = 2;          
+    uint32 Price = 3;         
+    string Image = 4;         
+    uint32 Quantity = 5;      
+}
+
+message RemoveItemRequest {
+    string CartID = 2;
+    string ProductID = 1;    
+}
+
+message ViewCartRequest {
+    string CartID = 1;       
+}
+
+message Cart {
+    string CartID = 3;
+    repeated Item Items = 1;  
+    uint32 TotalPrice = 2;   
+}
+
+message CartResponse {}
+
+
+
