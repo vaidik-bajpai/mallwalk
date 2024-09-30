@@ -127,5 +127,16 @@ func (g *gateway) ViewCart(ctx context.Context, vc *pb.ViewCartRequest) (*pb.Car
 	return c.ViewCart(ctx, vc)
 }
 
+func (g *gateway) UpdateStock(ctx context.Context, us *pb.UpdateStockRequest) (*pb.UpdateStockResponse, error) {
+	conn, err := discovery.ServiceConnection(context.Background(), "stock", g.registry)
+	if err != nil {
+		return nil, err
+	}
+
+	c := pb.NewStocksServiceClient(conn)
+
+	return c.UpdateStock(ctx, us)
+}
+
 func (g *gateway) PlaceOrder(ctx context.Context) error  { return nil }
 func (g *gateway) MakePayment(ctx context.Context) error { return nil }

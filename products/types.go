@@ -20,7 +20,7 @@ type ProductsStore interface {
 	Create(ctx context.Context, cp *Product) (*Product, error)
 	Get(ctx context.Context, id primitive.ObjectID) (*Product, error)
 	List(ctx context.Context, lp *pb.ListProductsRequest) ([]*pb.ProductSummary, error)
-	Update(ctx context.Context, up *pb.UpdateProductRequest) (*Product, error)
+	Update(ctx context.Context, pID string, up *UpdateProduct) (*UpdateProduct, error)
 	Delete(ctx context.Context, id primitive.ObjectID) error
 }
 
@@ -44,4 +44,15 @@ type ProductSummary struct {
 	Stock  uint32             `bson:"stock"`
 	Rating float32            `bson:"rating"`
 	Image  string             `bson:"image"`
+}
+
+type UpdateProduct struct {
+	Name        string    `bson:"name,omitempty"`
+	Description string    `bson:"description,omitempty"`
+	Price       uint32    `bson:"price,omitempty"`
+	Image       string    `bson:"image,omitempty"`
+	Stock       uint32    `bson:"stock,omitempty"`
+	Rating      float32   `bson:"rating,omitempty"`
+	Category    string    `bson:"category,omitempty"`
+	UpdateAt    time.Time `bson:"updated_at"`
 }

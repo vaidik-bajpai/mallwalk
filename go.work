@@ -7,4 +7,5 @@ use (
 	./payment
 	./products
 	./users
+	./stock
 )

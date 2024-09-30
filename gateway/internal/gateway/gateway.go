@@ -20,6 +20,8 @@ type APIGateway interface {
 	RemoveFromCart(context.Context, *pb.RemoveItemRequest) (*pb.CartResponse, error)
 	ViewCart(context.Context, *pb.ViewCartRequest) (*pb.Cart, error)
 
+	UpdateStock(context.Context, *pb.UpdateStockRequest) (*pb.UpdateStockResponse, error)
+
 	PlaceOrder(context.Context) error
 	MakePayment(context.Context) error
 }

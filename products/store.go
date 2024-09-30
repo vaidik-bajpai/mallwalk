@@ -93,52 +93,22 @@ func (s *store) List(ctx context.Context, lp *pb.ListProductsRequest) ([]*pb.Pro
 	return products, nil
 }
 
-func (s *store) Update(ctx context.Context, up *pb.UpdateProductRequest) (*Product, error) {
+func (s *store) Update(ctx context.Context, pID string, up *UpdateProduct) (*UpdateProduct, error) {
 	col := s.client.Database(DBName).Collection(CollName)
 
-	p := toProduct(up)
-
-	id, err := primitive.ObjectIDFromHex(up.ID)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = col.UpdateByID(ctx, bson.M{"_id": id}, bson.M{
-		"$set": p,
+	up.UpdateAt = time.Now()
+	_, err := col.UpdateByID(ctx, bson.M{"_id": pID}, bson.M{
+		"$set": up,
 	})
 	if err != nil {
 		return nil, err
 	}
 
-	return p, nil
+	return up, nil
 }
 
 func (s *store) Delete(ctx context.Context, id primitive.ObjectID) error {
 	col := s.client.Database(DBName).Collection(CollName)
 	_, err := col.DeleteOne(ctx, bson.M{"_id": id})
 	return err
-}
-
-func toProduct(up *pb.UpdateProductRequest) *Product {
-	return &Product{
-		Name:        up.Name,
-		Price:       up.Price,
-		Description: up.Description,
-		Rating:      up.Rating,
-		Stock:       up.Stock,
-		Category:    up.Category,
-		Image:       up.Image,
-		UpdatedAt:   time.Now(),
-	}
-}
-
-func toPBProductSummary(p *ProductSummary) *pb.ProductSummary {
-	return &pb.ProductSummary{
-		ID:     p.ID.String(),
-		Name:   p.Name,
-		Rating: p.Rating,
-		Image:  p.Image,
-		Price:  p.Price,
-		Stock:  p.Stock,
-	}
 }

@@ -7,6 +7,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/vaidik-bajpai/mallwalk/cart/gateway"
 	"github.com/vaidik-bajpai/mallwalk/common/discovery"
 	"github.com/vaidik-bajpai/mallwalk/common/discovery/consul"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -67,7 +68,8 @@ func main() {
 	}
 
 	store := NewStore(mongoClient)
-	svc := NewService(store)
+	gateway := gateway.NewStockGateway(registry)
+	svc := NewService(store, gateway)
 
 	NewGRPCHandler(grpcServer, svc)
 

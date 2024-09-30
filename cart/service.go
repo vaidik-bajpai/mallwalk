@@ -4,22 +4,32 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/vaidik-bajpai/mallwalk/cart/gateway"
 	pb "github.com/vaidik-bajpai/mallwalk/common/api"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type service struct {
-	store CartsStore
+	store   CartsStore
+	gateway gateway.StockGateway
 }
 
-func NewService(store CartsStore) *service {
+func NewService(store CartsStore, gateway gateway.StockGateway) *service {
 	return &service{
-		store: store,
+		store:   store,
+		gateway: gateway,
 	}
 }
 
 func (s *service) AddToCart(ctx context.Context, at *pb.AddToCartRequest) (*pb.CartResponse, error) {
-	err := s.store.Add(ctx, at.CartID, &Item{
+	res, err := s.gateway.CheckIfItemIsInStock(ctx, &pb.CheckIfItemIsInStockRequest{
+		ID: at.Item.ProductID,
+	})
+	if !res.InStock || err != nil {
+		return nil, nil
+	}
+
+	err = s.store.Add(ctx, at.CartID, &Item{
 		ProductID: at.Item.ProductID,
 		Name:      at.Item.Name,
 		Image:     at.Item.Image,
@@ -29,6 +39,7 @@ func (s *service) AddToCart(ctx context.Context, at *pb.AddToCartRequest) (*pb.C
 
 	return &pb.CartResponse{}, err
 }
+
 func (s *service) RemoveFromCart(ctx context.Context, ri *pb.RemoveItemRequest) (*pb.CartResponse, error) {
 	err := s.store.Remove(ctx, ri.CartID, ri.ProductID)
 	return &pb.CartResponse{}, err

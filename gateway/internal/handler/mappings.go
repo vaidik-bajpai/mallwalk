@@ -24,7 +24,6 @@ func toPBCreateProductRequest(p Product) *pb.CreateProductRequest {
 		Name:        p.Name,
 		Description: p.Description,
 		Category:    p.Category,
-		Stock:       p.Stock,
 		Price:       p.Price,
 		Rating:      p.Rating,
 		Image:       p.Image,
@@ -45,14 +44,13 @@ func toPBListProductRequest(pageNumber, pageSize uint32, category string, minRat
 		MinRating:  minRating,
 	}
 }
-func toPBUpdateProduct(p Product) *pb.UpdateProductRequest {
+func toPBUpdateProduct(pID string, p Product) *pb.UpdateProductRequest {
 	return &pb.UpdateProductRequest{
-		ID:          p.ID.Hex(),
+		ID:          pID,
 		Name:        p.Name,
 		Description: p.Description,
 		Category:    p.Category,
 		Price:       p.Price,
-		Stock:       p.Stock,
 		Rating:      p.Rating,
 		Image:       p.Image,
 	}
@@ -87,5 +85,12 @@ func toPBRemoveFromCart(pID, cID string) *pb.RemoveItemRequest {
 func toPBViewCart(cID string) *pb.ViewCartRequest {
 	return &pb.ViewCartRequest{
 		CartID: cID,
+	}
+}
+
+func toPBUpdateStockRequest(pID string, delta int64) *pb.UpdateStockRequest {
+	return &pb.UpdateStockRequest{
+		ID:    pID,
+		Delta: delta,
 	}
 }

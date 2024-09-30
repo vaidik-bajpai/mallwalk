@@ -33,6 +33,8 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("PUT /products/update/{productID}", h.HandleUpdateProduct)
 	mux.HandleFunc("DELETE /products/delete/{productID}", h.HandleDeleteProduct)
 
+	mux.HandleFunc("POST /stock/update", h.HandleStockUpdates)
+
 	mux.HandleFunc("POST /cart/add/{cartID}", h.HandleAddToCart)
 	mux.HandleFunc("DELETE /cart/{cartID}/remove/{productID}", h.HandleRemoveFromCart)
 	mux.HandleFunc("GET /cart/{cartID}/get", h.HandleListCartItems)
@@ -118,14 +120,12 @@ func (h *Handler) HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 }
 
 type Product struct {
-	ID          primitive.ObjectID `json:"id" validate:"omitempty"`
-	Name        string             `json:"name" validate:"required"`
-	Price       uint32             `json:"price" validate:"required,min=10"`
-	Stock       uint32             `json:"stock" validate:"required,min=1"`
-	Description string             `json:"description" validate:"required,min=20,max=300"`
-	Category    string             `json:"category" validate:"required,min=4,max=20"`
-	Rating      float32            `json:"rating" validate:"required"`
-	Image       string             `json:"image" validate:"required"`
+	Name        string  `json:"name" validate:"required"`
+	Price       uint32  `json:"price" validate:"required,min=10"`
+	Description string  `json:"description" validate:"required,min=20,max=300"`
+	Category    string  `json:"category" validate:"required,min=4,max=20"`
+	Rating      float32 `json:"rating" validate:"required"`
+	Image       string  `json:"image" validate:"required"`
 }
 
 func (h *Handler) HandleCreateProduct(w http.ResponseWriter, r *http.Request) {
@@ -222,9 +222,9 @@ func (h *Handler) HandleListProducts(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) HandleUpdateProduct(w http.ResponseWriter, r *http.Request) {
-	strID := r.PathValue("productID")
+	productID := r.PathValue("productID")
 
-	id, err := primitive.ObjectIDFromHex(strID)
+	_, err := primitive.ObjectIDFromHex(productID)
 	if err != nil {
 		log.Println(err)
 		common.WriteError(w, http.StatusBadRequest, "invalid credentials")
@@ -232,7 +232,6 @@ func (h *Handler) HandleUpdateProduct(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var product Product
-	product.ID = id
 	err = common.ReadJSON(r, &product)
 	if err != nil {
 		log.Println(err)
@@ -242,7 +241,7 @@ func (h *Handler) HandleUpdateProduct(w http.ResponseWriter, r *http.Request) {
 
 	ctx := context.Background()
 
-	p, err := h.gateway.UpdateProduct(ctx, toPBUpdateProduct(product))
+	p, err := h.gateway.UpdateProduct(ctx, toPBUpdateProduct(productID, product))
 	rStatus := status.Convert(err)
 	if rStatus != nil {
 		log.Println(err)
@@ -370,6 +369,46 @@ func (h *Handler) HandleListCartItems(w http.ResponseWriter, r *http.Request) {
 
 	common.WriteJSON(w, http.StatusOK, map[string]interface{}{
 		"cart": cart,
+	})
+}
+
+type StockValue struct {
+	Delta int64 `json:"delta" validate:"required"`
+}
+
+func (h *Handler) HandleStockUpdates(w http.ResponseWriter, r *http.Request) {
+	productID := r.PathValue("productID")
+
+	if _, err := primitive.ObjectIDFromHex(productID); err != nil {
+		log.Println(err)
+		common.WriteError(w, http.StatusBadRequest, "invalid id")
+		return
+	}
+
+	var stockValue StockValue
+	if err := common.ReadJSON(r, &stockValue); err != nil {
+		log.Println(err)
+		common.WriteError(w, http.StatusBadRequest, "invalid credentials")
+		return
+	}
+
+	if err := h.validate.Struct(stockValue); err != nil {
+		log.Println(err)
+		common.WriteError(w, http.StatusBadRequest, "invalid credentials")
+		return
+	}
+
+	ctx := context.Background()
+	_, err := h.gateway.UpdateStock(ctx, toPBUpdateStockRequest(productID, stockValue.Delta))
+	rStatus := status.Convert(err)
+	if rStatus != nil {
+		log.Println(err)
+		common.WriteError(w, http.StatusInternalServerError, "something went wrong with our servers")
+		return
+	}
+
+	common.WriteJSON(w, http.StatusOK, map[string]string{
+		"message": "the product stocks were updated successfully",
 	})
 }
 

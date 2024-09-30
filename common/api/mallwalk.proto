@@ -42,7 +42,6 @@ service ProductService {
 message CreateProductRequest {
     string Name = 1;
     uint32 Price = 2;
-    uint32 Stock = 3;
     string Description = 4;
     string Category = 5;
     float Rating = 6;
@@ -53,7 +52,6 @@ message Product{
     string ID = 1;
     string Name = 2;
     uint32 Price = 3;
-    uint32 Stock = 4;
     string Description = 5;
     string Category = 6;
     float Rating = 7;
@@ -66,7 +64,6 @@ message ProductSummary {
     string ID = 1;
     string Name = 2;
     uint32 Price = 3;
-    uint32 Stock = 4;
     float Rating = 5;
     string Image = 6;
 }
@@ -91,7 +88,6 @@ message UpdateProductRequest{
     string ID = 1;
     string Name = 2;
     uint32 Price = 3;
-    uint32 Stock = 4;
     string Description = 5;
     string Category = 6;
     float Rating = 7;
@@ -140,6 +136,27 @@ message Cart {
 }
 
 message CartResponse {}
+
+service StocksService {
+    rpc CheckIfItemIsInStock(CheckIfItemIsInStockRequest) returns (CheckIfItemIsInStockResponse);
+    rpc UpdateStock(UpdateStockRequest) returns (UpdateStockResponse);
+}
+
+message CheckIfItemIsInStockRequest {
+    string ID = 1;
+    int64 Quantity = 2;
+}
+
+message CheckIfItemIsInStockResponse {
+    bool InStock = 1;
+}
+
+message UpdateStockRequest {
+    string ID = 1;
+    int64 delta = 2;
+}
+
+message UpdateStockResponse {}
 
 
 

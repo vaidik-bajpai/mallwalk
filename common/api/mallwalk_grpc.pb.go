@@ -546,3 +546,130 @@ var CartService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "api/mallwalk.proto",
 }
+
+const (
+	StocksService_CheckIfItemIsInStock_FullMethodName = "/api.StocksService/CheckIfItemIsInStock"
+	StocksService_UpdateStock_FullMethodName          = "/api.StocksService/UpdateStock"
+)
+
+// StocksServiceClient is the client API for StocksService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type StocksServiceClient interface {
+	CheckIfItemIsInStock(ctx context.Context, in *CheckIfItemIsInStockRequest, opts ...grpc.CallOption) (*CheckIfItemIsInStockResponse, error)
+	UpdateStock(ctx context.Context, in *UpdateStockRequest, opts ...grpc.CallOption) (*UpdateStockResponse, error)
+}
+
+type stocksServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewStocksServiceClient(cc grpc.ClientConnInterface) StocksServiceClient {
+	return &stocksServiceClient{cc}
+}
+
+func (c *stocksServiceClient) CheckIfItemIsInStock(ctx context.Context, in *CheckIfItemIsInStockRequest, opts ...grpc.CallOption) (*CheckIfItemIsInStockResponse, error) {
+	out := new(CheckIfItemIsInStockResponse)
+	err := c.cc.Invoke(ctx, StocksService_CheckIfItemIsInStock_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *stocksServiceClient) UpdateStock(ctx context.Context, in *UpdateStockRequest, opts ...grpc.CallOption) (*UpdateStockResponse, error) {
+	out := new(UpdateStockResponse)
+	err := c.cc.Invoke(ctx, StocksService_UpdateStock_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// StocksServiceServer is the server API for StocksService service.
+// All implementations must embed UnimplementedStocksServiceServer
+// for forward compatibility
+type StocksServiceServer interface {
+	CheckIfItemIsInStock(context.Context, *CheckIfItemIsInStockRequest) (*CheckIfItemIsInStockResponse, error)
+	UpdateStock(context.Context, *UpdateStockRequest) (*UpdateStockResponse, error)
+	mustEmbedUnimplementedStocksServiceServer()
+}
+
+// UnimplementedStocksServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedStocksServiceServer struct {
+}
+
+func (UnimplementedStocksServiceServer) CheckIfItemIsInStock(context.Context, *CheckIfItemIsInStockRequest) (*CheckIfItemIsInStockResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckIfItemIsInStock not implemented")
+}
+func (UnimplementedStocksServiceServer) UpdateStock(context.Context, *UpdateStockRequest) (*UpdateStockResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateStock not implemented")
+}
+func (UnimplementedStocksServiceServer) mustEmbedUnimplementedStocksServiceServer() {}
+
+// UnsafeStocksServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to StocksServiceServer will
+// result in compilation errors.
+type UnsafeStocksServiceServer interface {
+	mustEmbedUnimplementedStocksServiceServer()
+}
+
+func RegisterStocksServiceServer(s grpc.ServiceRegistrar, srv StocksServiceServer) {
+	s.RegisterService(&StocksService_ServiceDesc, srv)
+}
+
+func _StocksService_CheckIfItemIsInStock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckIfItemIsInStockRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StocksServiceServer).CheckIfItemIsInStock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StocksService_CheckIfItemIsInStock_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StocksServiceServer).CheckIfItemIsInStock(ctx, req.(*CheckIfItemIsInStockRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _StocksService_UpdateStock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateStockRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StocksServiceServer).UpdateStock(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: StocksService_UpdateStock_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StocksServiceServer).UpdateStock(ctx, req.(*UpdateStockRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// StocksService_ServiceDesc is the grpc.ServiceDesc for StocksService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var StocksService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "api.StocksService",
+	HandlerType: (*StocksServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CheckIfItemIsInStock",
+			Handler:    _StocksService_CheckIfItemIsInStock_Handler,
+		},
+		{
+			MethodName: "UpdateStock",
+			Handler:    _StocksService_UpdateStock_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "api/mallwalk.proto",
+}
