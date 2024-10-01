@@ -673,3 +673,93 @@ var StocksService_ServiceDesc = grpc.ServiceDesc{
 	Streams:  []grpc.StreamDesc{},
 	Metadata: "api/mallwalk.proto",
 }
+
+const (
+	OrderService_PlaceAnOrder_FullMethodName = "/api.OrderService/PlaceAnOrder"
+)
+
+// OrderServiceClient is the client API for OrderService service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type OrderServiceClient interface {
+	PlaceAnOrder(ctx context.Context, in *UnimplementedRequest, opts ...grpc.CallOption) (*UnimplementedResponse, error)
+}
+
+type orderServiceClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewOrderServiceClient(cc grpc.ClientConnInterface) OrderServiceClient {
+	return &orderServiceClient{cc}
+}
+
+func (c *orderServiceClient) PlaceAnOrder(ctx context.Context, in *UnimplementedRequest, opts ...grpc.CallOption) (*UnimplementedResponse, error) {
+	out := new(UnimplementedResponse)
+	err := c.cc.Invoke(ctx, OrderService_PlaceAnOrder_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// OrderServiceServer is the server API for OrderService service.
+// All implementations must embed UnimplementedOrderServiceServer
+// for forward compatibility
+type OrderServiceServer interface {
+	PlaceAnOrder(context.Context, *UnimplementedRequest) (*UnimplementedResponse, error)
+	mustEmbedUnimplementedOrderServiceServer()
+}
+
+// UnimplementedOrderServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedOrderServiceServer struct {
+}
+
+func (UnimplementedOrderServiceServer) PlaceAnOrder(context.Context, *UnimplementedRequest) (*UnimplementedResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PlaceAnOrder not implemented")
+}
+func (UnimplementedOrderServiceServer) mustEmbedUnimplementedOrderServiceServer() {}
+
+// UnsafeOrderServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to OrderServiceServer will
+// result in compilation errors.
+type UnsafeOrderServiceServer interface {
+	mustEmbedUnimplementedOrderServiceServer()
+}
+
+func RegisterOrderServiceServer(s grpc.ServiceRegistrar, srv OrderServiceServer) {
+	s.RegisterService(&OrderService_ServiceDesc, srv)
+}
+
+func _OrderService_PlaceAnOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UnimplementedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OrderServiceServer).PlaceAnOrder(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: OrderService_PlaceAnOrder_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OrderServiceServer).PlaceAnOrder(ctx, req.(*UnimplementedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// OrderService_ServiceDesc is the grpc.ServiceDesc for OrderService service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var OrderService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "api.OrderService",
+	HandlerType: (*OrderServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "PlaceAnOrder",
+			Handler:    _OrderService_PlaceAnOrder_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "api/mallwalk.proto",
+}

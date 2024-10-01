@@ -8,4 +8,5 @@ use (
 	./products
 	./users
 	./stock
+	./order
 )

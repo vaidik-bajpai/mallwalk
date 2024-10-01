@@ -158,5 +158,13 @@ message UpdateStockRequest {
 
 message UpdateStockResponse {}
 
+service OrderService {
+    rpc PlaceAnOrder(UnimplementedRequest) returns (UnimplementedResponse);
+}
+
+message UnimplementedRequest{}
+
+message UnimplementedResponse{}
+
 
 

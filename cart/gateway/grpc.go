@@ -11,6 +11,10 @@ type Gateway struct {
 	registry discovery.Registry
 }
 
+func (g *Gateway) UpdateStock(context.Context, *pb.CheckIfItemIsInStockRequest) (*pb.CartResponse, error) {
+	panic("unimplemented")
+}
+
 func NewStockGateway(registry discovery.Registry) *Gateway {
 	return &Gateway{
 		registry: registry,

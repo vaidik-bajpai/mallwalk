@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	pb "github.com/vaidik-bajpai/mallwalk/common/api"
@@ -65,12 +66,15 @@ func (s *store) List(ctx context.Context, lp *pb.ListProductsRequest) ([]*pb.Pro
 	filter := bson.M{}
 
 	if lp.MinRating > 0 {
-		filter["rating"] = lp.MinRating
+		filter["rating"] = bson.M{"$gte": lp.MinRating}
 	}
 
 	if lp.Category != "" {
-		filter["category"] = lp.Category
+		filter["category"] = bson.M{"$regex": lp.Category, "$options": "i"}
 	}
+
+	fmt.Println(fOpts)
+	fmt.Println(filter)
 
 	cursor, err := col.Find(ctx, filter, fOpts)
 	if err != nil {
@@ -96,12 +100,18 @@ func (s *store) List(ctx context.Context, lp *pb.ListProductsRequest) ([]*pb.Pro
 func (s *store) Update(ctx context.Context, pID string, up *UpdateProduct) (*UpdateProduct, error) {
 	col := s.client.Database(DBName).Collection(CollName)
 
+	objID, err := primitive.ObjectIDFromHex(pID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid product ID: %v", err)
+	}
+
 	up.UpdateAt = time.Now()
-	_, err := col.UpdateByID(ctx, bson.M{"_id": pID}, bson.M{
+
+	_, err = col.UpdateByID(ctx, objID, bson.M{
 		"$set": up,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to update product: %v", err)
 	}
 
 	return up, nil

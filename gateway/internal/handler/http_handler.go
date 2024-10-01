@@ -29,11 +29,11 @@ func (h *Handler) RegisterRoutes(mux *http.ServeMux) {
 
 	mux.HandleFunc("POST /products/create", h.HandleCreateProduct)
 	mux.HandleFunc("GET /products/get/{productID}", h.HandleGetProduct)
-	mux.HandleFunc("GET /products/list", h.HandleGetProduct)
+	mux.HandleFunc("GET /products/list", h.HandleListProducts)
 	mux.HandleFunc("PUT /products/update/{productID}", h.HandleUpdateProduct)
 	mux.HandleFunc("DELETE /products/delete/{productID}", h.HandleDeleteProduct)
 
-	mux.HandleFunc("POST /stock/update", h.HandleStockUpdates)
+	mux.HandleFunc("PUT /stock/update/{productID}", h.HandleStockUpdates)
 
 	mux.HandleFunc("POST /cart/add/{cartID}", h.HandleAddToCart)
 	mux.HandleFunc("DELETE /cart/{cartID}/remove/{productID}", h.HandleRemoveFromCart)

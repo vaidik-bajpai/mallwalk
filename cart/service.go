@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/vaidik-bajpai/mallwalk/cart/gateway"
@@ -25,8 +26,11 @@ func (s *service) AddToCart(ctx context.Context, at *pb.AddToCartRequest) (*pb.C
 	res, err := s.gateway.CheckIfItemIsInStock(ctx, &pb.CheckIfItemIsInStockRequest{
 		ID: at.Item.ProductID,
 	})
-	if !res.InStock || err != nil {
-		return nil, nil
+	switch {
+	case err != nil:
+		return nil, err
+	case !res.InStock:
+		return nil, errors.New("out of stock")
 	}
 
 	err = s.store.Add(ctx, at.CartID, &Item{
